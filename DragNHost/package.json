@@ -1,0 +1,32 @@
+{
+  "name": "drag-n-host",
+  "version": "1.0.0",
+  "description": "Drag a folder to spin up a local http server. Works on OSX, Windows, and Linux.",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron main.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jceipek/drag-n-host.git"
+  },
+  "keywords": [
+    "localhost",
+    "drag",
+    "drop",
+    "folder"
+  ],
+  "author": "jceipek",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jceipek/drag-n-host/issues"
+  },
+  "homepage": "https://github.com/jceipek/drag-n-host#readme",
+  "devDependencies": {
+    "electron-prebuilt": "^0.36.0",
+    "electron-rebuild": "^1.1.3"
+  },
+  "dependencies": {
+    "http-server": "^0.8.5"
+  }
+}
