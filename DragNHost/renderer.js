@@ -35,6 +35,9 @@ function ignoreEvent (e) {
 
 function handleDragStart (e) {
   STATE.dragReferenceCounter++;
+  if (STATE.dragReferenceCounter == 1) {
+    Velocity(actionCircle, { scaleX: 1.05, scaleY: 1.05 }, { duration: 500, loop: true/*complete: complete, easing: [ 300, 8 ]*/ });
+  }
   actionCircle.classList.add('dragging');
   ignoreEvent(e);
 }
@@ -42,6 +45,8 @@ function handleDragStart (e) {
 function handleDragStop (e) {
   STATE.dragReferenceCounter--;
   if (STATE.dragReferenceCounter === 0) {
+    Velocity(actionCircle, 'stop');
+    Velocity(actionCircle, { scaleX: 1, scaleY: 1 }, { duration: 200 });
     actionCircle.classList.remove('dragging');
   }
   ignoreEvent(e);
@@ -94,7 +99,6 @@ const jsPortSelector = document.getElementsByClassName('js-port-selector')[0];
 const jsURLReadout = document.getElementsByClassName('js-url-readout')[0];
 const jsHostingLog = document.getElementsByClassName('js-hosting-log')[0];
 const ellipsis = document.getElementsByClassName('js-ellipsis')[0];
-
 
 
 // $('.js-ellipsis').blast({ delimiter: "character" }).velocity({color: '#F00'}, 1000);
