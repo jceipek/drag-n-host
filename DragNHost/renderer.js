@@ -8,6 +8,7 @@ const Shell = require('electron').shell;
 window.$ = window.jQuery = require('jquery');
 const Blast = require('blast-text');
 const Velocity = require('velocity-animate');
+const VelocityUIPack = require('velocity-ui-pack');
 
 const STATE = {
   path: null
@@ -36,7 +37,7 @@ function ignoreEvent (e) {
 function handleDragStart (e) {
   STATE.dragReferenceCounter++;
   if (STATE.dragReferenceCounter == 1) {
-    Velocity(actionCircle, { scaleX: 1.05, scaleY: 1.05 }, { duration: 500, loop: true/*complete: complete, easing: [ 300, 8 ]*/ });
+    Velocity(actionCircle, { scaleX: 1.05, scaleY: 1.05 }, { duration: 500, loop: true });
   }
   actionCircle.classList.add('dragging');
   ignoreEvent(e);
@@ -86,7 +87,22 @@ function startHosting (folderPath) {
     pathElem.textContent = folderPath;
     addClasses(readyUIs, 'hidden');
     removeClasses(hostingUIs, 'hidden');
+
+    var value = 360; //animate to
+    var steps = 2; //animation steps per frame (1/60sec.)
+    var time = (1000/60)*(value/steps); //animation time
+    Velocity(actionCircle, { rotateZ: value }, { duration: time, easing:'linear', loop: true });
   });
+}
+
+function stopHosting () {
+  if (STATE.serverInstance !== null) {
+    STATE.serverInstance.close();
+    STATE.serverInstance = null;
+    Velocity(actionCircle, 'stop');
+    Velocity(actionCircle, { rotateZ: 0 }, { duration: 500, easing:'linear' });
+    jsHostingLog.innerHTML = "";
+  }
 }
 
 const actionCircle = document.getElementsByClassName('js-action-circle')[0];
@@ -101,7 +117,20 @@ const jsHostingLog = document.getElementsByClassName('js-hosting-log')[0];
 const ellipsis = document.getElementsByClassName('js-ellipsis')[0];
 
 
-// $('.js-ellipsis').blast({ delimiter: "character" }).velocity({color: '#F00'}, 1000);
+$.Velocity.RegisterEffect("callout.pulse", {
+    defaultDuration: 300,
+    calls: [
+        [ { opacity: 1 }, 0.5 ],
+        [ { opacity: 0 }, 0.5 ]
+        // [ { opacity: 1 }, 0.33 ]
+    ]
+    , reset: { opacity: 1 }
+});
+var grp = $('.js-ellipsis').blast({ delimiter: "character" });
+const repeat = function () {
+  grp.velocity('callout.pulse', { stagger: 100, complete: repeat });
+}
+repeat();
 
 jsPortSelector.addEventListener('keydown', blurOnReturn);
 
@@ -120,10 +149,7 @@ jsPortSelector.addEventListener('blur', function (e) {
 jsURLReadout.addEventListener('click', openSelectionInBrowser);
 
 stopButton.addEventListener('click', function (e) {
-  if (STATE.serverInstance !== null) {
-    STATE.serverInstance.close();
-    STATE.serverInstance = null;
-  }
+  stopHosting();
   removeClasses(readyUIs, 'hidden');
   addClasses(hostingUIs, 'hidden');
 }, false);
