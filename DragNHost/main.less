@@ -1,3 +1,17 @@
+@bg-color: #F6F3EC;
+@bg-color-info-bubble: #5E5954;
+@bg-color-info-bubble-alt: #4A4741;
+
+@text-color-main: #ECF0F1;
+@text-color-darkest: #5E5954;
+@text-color-dark: #928B85;
+
+@info-bubble-header-text-size: 1.3rem;
+@info-bubble-padding: 1rem;
+@info-bubble-radius: 20px;
+@info-bubble-arrow-size: 20px;
+
+
 @font-face {
   font-family: 'Montserrat';
   font-style: normal;
@@ -5,120 +19,149 @@
   src: local('Montserrat-Regular'), url(Montserrat/Montserrat-Regular.woff2) format('woff2');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215, U+E0FF, U+EFFD, U+F000;
 }
+
 body {
   margin: 0;
   font-family: Montserrat, sans-serif;
-  background-color: #f6f3ec;
+  background-color: @bg-color;
 }
+
 html,
 body {
   height: 100%;
-  color: #ecf0f1;
+  color: @text-color-main;
 }
+
+// .js-ready-ui {
+//   display: none;
+// }
+
+// .js-hosting-ui {
+//   display: none;
+// }
+
 .hidden {
   display: none;
 }
+
 .container {
   display: flex;
   flex-direction: column;
   height: 100%;
 }
+
 .info-bubble {
-  margin: 1rem 1rem 0 1rem;
+  margin: @info-bubble-padding @info-bubble-padding 0 @info-bubble-padding;
   overflow: hidden;
   flex: none;
 }
+
 .info-bubble-header {
-  background-color: #5e5954;
-  padding: 1rem 1rem 0 1rem;
-  /* top, right, bottom, left */
-  border-radius: 20px 20px 0px 0px;
-  /* tl; tr; br; bl */
+  background-color: @bg-color-info-bubble;
+  padding: @info-bubble-padding @info-bubble-padding 0 @info-bubble-padding; /* top, right, bottom, left */
+  border-radius: @info-bubble-radius @info-bubble-radius 0px 0px; /* tl; tr; br; bl */
 }
+
 .info-bubble-header-text {
-  font-size: 1.3rem;
+  font-size: @info-bubble-header-text-size;
 }
+
 .info-bubble-status-container {
-  background-color: #5e5954;
+  background-color: @bg-color-info-bubble;
   padding-top: 0.3rem;
 }
+
 .info-bubble-status {
-  background-color: #4a4741;
+  background-color: @bg-color-info-bubble-alt;
   max-height: 20vh;
   overflow-y: scroll;
-  padding: 1rem;
+  padding: @info-bubble-padding;
 }
+
 .info-bubble-footer {
-  background-color: #5e5954;
-  padding: 0rem 1rem 1rem 1rem;
-  /* top, right, bottom, left */
-  border-radius: 0px 0px 20px 20px;
-  /* tl; tr; br; bl */
+  background-color: @bg-color-info-bubble;
+  padding: 0rem @info-bubble-padding @info-bubble-padding @info-bubble-padding; /* top, right, bottom, left */
+  border-radius: 0px 0px @info-bubble-radius @info-bubble-radius; /* tl; tr; br; bl */
 }
+
 .info-bubble-footer-arrow {
   width: 0;
   height: 0;
-  border-left: 20px solid transparent;
-  border-right: 20px solid transparent;
-  border-top: 20px solid #5e5954;
+  border-left: @info-bubble-arrow-size solid transparent;
+  border-right: @info-bubble-arrow-size solid transparent;
+  border-top: @info-bubble-arrow-size solid @bg-color-info-bubble;
   margin: auto;
 }
+
 .action-region {
   flex: 1 1 100%;
 }
+
 .action-circle {
   stroke-dashoffset: 1;
   fill: #E7E3DB;
   stroke: #CFCBC3;
   stroke-width: 2;
 }
+
 .instructions {
-  fill: #5e5954;
+  fill: @text-color-darkest;
 }
+
 .instructions-alt {
-  fill: #928b85;
+  fill: @text-color-dark;
 }
-.clickable:hover,
-.clickable-unstyled:hover {
+
+.clickable:hover, .clickable-unstyled:hover {
   cursor: pointer;
 }
+
 .clickable {
   color: #FC826A;
   fill: #FC826A;
   text-decoration: underline;
 }
+
 .clickable:hover {
   cursor: pointer;
 }
+
 .port-selector {
   background: none;
   border: none;
   width: 2.5em;
 }
+
 .port-selector:focus {
   text-decoration: none;
   outline: none;
 }
+
 .stop-ring-outer {
   fill: #928B85;
   stroke: #ECF0F1;
   stroke-width: 2px;
 }
+
 .stop-ring-inner {
   fill: #FC826A;
   stroke: #ECF0F1;
   stroke-width: 2px;
 }
+
 .stop-button-label {
-  fill: #ecf0f1;
+  fill: @text-color-main;
   text-decoration: none;
 }
+
 .log-message {
   color: #7FD08C;
 }
+
 .log-message-error {
   color: #FC826A;
 }
+
 /*
 .status-bar {
   background-color: #5E5954;

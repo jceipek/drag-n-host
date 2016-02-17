@@ -1,13 +1,13 @@
 'use strict';
 
-const remote = require('electron').remote;
-const fs = require('fs');
-const serverMaker = require('http-server');
-const shell = require('electron').shell;
-window.$ = window.jQuery = require('jquery');
-const blast = require('blast-text');
-const velocity = require('velocity-animate');
+const Remote = require('electron').remote;
+const Fs = require('fs');
+const ServerMaker = require('http-server');
 const HTTPStatus = require('http-status');
+const Shell = require('electron').shell;
+window.$ = window.jQuery = require('jquery');
+const Blast = require('blast-text');
+const Velocity = require('velocity-animate');
 
 const STATE = {
   path: null
@@ -17,27 +17,14 @@ const STATE = {
 };
 const HOST = 'localhost';
 
-const dropzone = document.getElementsByClassName('drop-zone')[0];
-const dropUIs = document.getElementsByClassName('js-drop-ui');
-const hostingUIs = document.getElementsByClassName('js-hosting-ui');
-const browseButton = document.getElementsByClassName('js-browse')[0];
-const stopButton = document.getElementsByClassName('js-stop-hosting')[0];
-const pathElem = document.getElementsByClassName('js-path')[0];
-const jsPortSelector = document.getElementsByClassName('js-port-selector')[0];
-const jsURLReadout = document.getElementsByClassName('js-url-readout')[0];
-const ellipsis = document.getElementsByClassName('js-ellipsis')[0];
-
 require('electron').webFrame.setZoomLevelLimits(1, 1); // Prevent pinch to zoom in window
-
-
-$('.js-ellipsis').blast({ delimiter: "character" }).velocity({color: '#F00'}, 1000);
 
 function blurOnReturn (e) {
   if (e.which === 13) { this.blur(); }
 }
 
 function openSelectionInBrowser (e) {
-  shell.openExternal(this.textContent);
+  Shell.openExternal(this.textContent);
   e.preventDefault();
 }
 
@@ -48,25 +35,30 @@ function ignoreEvent (e) {
 
 function handleDragStart (e) {
   STATE.dragReferenceCounter++;
-  dropzone.classList.add('dragging');
+  actionCircle.classList.add('dragging');
   ignoreEvent(e);
 }
 
 function handleDragStop (e) {
   STATE.dragReferenceCounter--;
   if (STATE.dragReferenceCounter === 0) {
-    dropzone.classList.remove('dragging');
+    actionCircle.classList.remove('dragging');
   }
   ignoreEvent(e);
 }
 
 function logFn (req, res, error) {
-  var date = new Date().toUTCString();
+  // const date = new Date().toUTCString();
+  const logElem = document.createElement("div");
   if (error) {
-    console.log([date, req.method, req.url, error.status.toString(), error.message]);
+    logElem.classList.add('log-message-error');
+    logElem.textContent = [/*date,*/ req.method, req.url, error.status.toString(), error.message].join(' ');
   } else { // Success
-    console.log([date, req.method, req.url, req.headers['user-agent']]);
+    logElem.classList.add('log-message');
+    logElem.textContent = [/*date,*/ req.method, req.url /*, req.headers['user-agent']*/].join(' ');
   }
+  // jsHostingLog.appendChild(logElem);
+  jsHostingLog.insertBefore(logElem, jsHostingLog.firstChild);
 }
 
 function removeClasses (elems, classname) {
@@ -84,13 +76,28 @@ function addClasses (elems, classname) {
 function startHosting (folderPath) {
   if (STATE.serverInstance !== null) { return; }
   console.log(folderPath);
-  STATE.serverInstance = serverMaker.createServer({root: folderPath, cache:-1, logFn: logFn, cors: true});
+  STATE.serverInstance = ServerMaker.createServer({root: folderPath, cache:-1, logFn: logFn, cors: true});
   STATE.serverInstance.listen(STATE.port, HOST, function () {
     pathElem.textContent = folderPath;
-    addClasses(dropUIs, 'hidden');
+    addClasses(readyUIs, 'hidden');
     removeClasses(hostingUIs, 'hidden');
   });
 }
+
+const actionCircle = document.getElementsByClassName('js-action-circle')[0];
+const readyUIs = document.getElementsByClassName('js-ready-ui');
+const hostingUIs = document.getElementsByClassName('js-hosting-ui');
+const browseButton = document.getElementsByClassName('js-browse')[0];
+const stopButton = document.getElementsByClassName('js-stop-hosting')[0];
+const pathElem = document.getElementsByClassName('js-path')[0];
+const jsPortSelector = document.getElementsByClassName('js-port-selector')[0];
+const jsURLReadout = document.getElementsByClassName('js-url-readout')[0];
+const jsHostingLog = document.getElementsByClassName('js-hosting-log')[0];
+const ellipsis = document.getElementsByClassName('js-ellipsis')[0];
+
+
+
+// $('.js-ellipsis').blast({ delimiter: "character" }).velocity({color: '#F00'}, 1000);
 
 jsPortSelector.addEventListener('keydown', blurOnReturn);
 
@@ -113,7 +120,7 @@ stopButton.addEventListener('click', function (e) {
     STATE.serverInstance.close();
     STATE.serverInstance = null;
   }
-  removeClasses(dropUIs, 'hidden');
+  removeClasses(readyUIs, 'hidden');
   addClasses(hostingUIs, 'hidden');
 }, false);
 
@@ -125,21 +132,21 @@ document.addEventListener("dragleave", handleDragStop, false);
 document.addEventListener("dragenter", handleDragStart, false);
 document.addEventListener("dragexit", handleDragStop, false);
 window.addEventListener("drop", function(e) {
+  handleDragStop(e);
   var length = e.dataTransfer.files.length;
   if (length !== 1) { return; }
   var file = e.dataTransfer.files[0];
   var filePath = file.path;
-  var isDirectory = fs.lstatSync(filePath).isDirectory();
+  var isDirectory = Fs.lstatSync(filePath).isDirectory();
   if (isDirectory) {
     startHosting(filePath);
   }
-  handleDragStop(e);
 }, false);
 
 browseButton.addEventListener('click', function (e) {
-  remote.dialog.showOpenDialog(remote.getCurrentWindow(), { properties: [ 'openDirectory' ]}, function (picked) {
-    if (picked !== undefined) {
-      startHosting(picked[0]);
-    }
+  Remote.dialog.showOpenDialog( Remote.getCurrentWindow()
+                              , { properties: [ 'openDirectory' ] }
+                              , function (picked) {
+    if (picked !== undefined) { startHosting(picked[0]); }
   });
 });

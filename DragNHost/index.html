@@ -8,6 +8,52 @@
   </head>
   <body>
     <div class='container'>
+      <div class='info-bubble'>
+        <div class='info-bubble-header'>
+          <div class='js-ready-ui'><span class='info-bubble-header-text'>READY TO HOST ON PORT </span><input class='js-port-selector port-selector clickable info-bubble-header-text' type='text' value='8000' /><span class='js-ellipsis info-bubble-header-text'>...</span></div>
+          <div class='js-hosting-ui hidden js-path path-readout'>/my/super/awesome/path</div>
+          <div class='js-hosting-ui hidden info-bubble-header-text'>HOSTING AT <a class='js-url-readout clickable' href='javascript:void(0)'>http://localhost:8000</a></div>
+        </div>
+        <div class='js-hosting-ui hidden info-bubble-status-container'>
+          <div class='js-hosting-log info-bubble-status'>
+<!-- <div class='log-message log-message-error'>Welcome to fish, the friendly interactive shell</div>
+<div class='log-message'>Type help for instructions on how to use fish</div>
+<div class='log-message'>jceipek@Elementa ~/D/L/DragNHost> node server</div>
+<div class='log-message'>module.js:327</div>
+<div class='log-message'>    throw err;</div>
+<div class='log-message'>    ^</div>
+
+<div class='log-message'>Error: Cannot find module '/Users/jceipek/Development/Localhoster/DragNHost/server'</div>
+<div class='log-message'>    at Function.Module._resolveFilename (module.js:325:15)</div>
+<div class='log-message'>    at Function.Module._load (module.js:276:25)</div>
+<div class='log-message'>    at Function.Module.runMain (module.js:429:10)</div>
+<div class='log-message'>    at startup (node.js:139:18)</div>
+<div class='log-message'>    at node.js:999:3</div>
+<div class='log-message'>jceipek@Elementa ~/D/L/DragNHost> npm start</div>
+
+<div class='log-message'>> drag-n-host@1.0.0 start /Users/jceipek/Development/Localhoster/DragNHost</div>
+<div class='log-message'>> electron main.js</div> -->
+          </div>
+        </div>
+        <div class='info-bubble-footer'></div>
+        <div class='info-bubble-footer-arrow'></div>
+      </div>
+      <svg class='action-region' viewBox='-50 -50 100 100' version='1.1' xmlns='http://www.w3.org/2000/svg'>
+        <circle class='js-action-circle action-circle' stroke-dasharray='5, 5' cx='0' cy='0' r='45'/>
+        <g class='js-ready-ui'>
+          <text class='instructions' x='0' y='0' text-anchor='middle' font-size='8'>DRAG &amp; DROP</text>
+          <text class='instructions-alt' x='0' y='8' text-anchor='middle' font-size='6'>a folder or <a class='js-browse clickable' href="javascript:void(0)">browse</a></text>
+        </g>
+        <g class='js-hosting-ui hidden js-stop-hosting clickable-unstyled'>
+            <circle class='stop-ring-outer' cx='0' cy='0' r='30'/>
+            <circle class='stop-ring-inner' cx='0' cy='0' r='20'/>
+            <text class='stop-button-label' x='0' y='0' text-anchor='middle' dominant-baseline='central' font-size='9'>STOP</text>
+        </g>
+      </svg>
+    </div>
+
+    <!--
+    <div class='container'>
       <div class='status-bar'>
         <span class='js-drop-ui status-bar-readout'><span class='js-status'>READY TO HOST ON PORT</span> <input class='port-selector js-port-selector' type='text' value='8000' /><span class='js-ellipsis'>...</span></span>
         <span class='js-hosting-ui hidden status-bar-readout'><span class='js-status'>HOSTING AT <a class='js-url-readout' href='javascript:void(0)'>http://localhost:8000</a></span></span>
@@ -26,6 +72,7 @@
         <text class='js-path path-readout' x='0' y='30' text-anchor='middle' font-size='3'>path to folder</text>
       </svg>
     </div>
+    -->
     <script type='text/javascript' src='renderer.js'></script>
   </body>
 </html>
