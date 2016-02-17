@@ -7,6 +7,7 @@ const shell = require('electron').shell;
 window.$ = window.jQuery = require('jquery');
 const blast = require('blast-text');
 const velocity = require('velocity-animate');
+const HTTPStatus = require('http-status');
 
 const STATE = {
   path: null
@@ -26,51 +27,19 @@ const jsPortSelector = document.getElementsByClassName('js-port-selector')[0];
 const jsURLReadout = document.getElementsByClassName('js-url-readout')[0];
 const ellipsis = document.getElementsByClassName('js-ellipsis')[0];
 
-require('electron').webFrame.setZoomLevelLimits(1, 1)
+require('electron').webFrame.setZoomLevelLimits(1, 1); // Prevent pinch to zoom in window
 
 
 $('.js-ellipsis').blast({ delimiter: "character" }).velocity({color: '#F00'}, 1000);
 
+function blurOnReturn (e) {
+  if (e.which === 13) { this.blur(); }
+}
 
-jsURLReadout.addEventListener('click', function (e) {
-  e.preventDefault();
+function openSelectionInBrowser (e) {
   shell.openExternal(this.textContent);
-});
-
-jsPortSelector.addEventListener('keydown', function (e) {
-  if (e.which === 13) {
-    jsPortSelector.blur();
-  }
-});
-
-jsPortSelector.addEventListener('blur', function (e) {
-  var validated = parseInt(this.value, 10);
-  if (validated < 1025) {
-    validated = 8000;
-  } else if (validated > 65535) {
-    validated = 65535;
-  }
-  this.value = validated;
-  STATE.port = validated;
-  jsURLReadout.textContent = 'http://'+HOST+':'+validated;
-});
-
-browseButton.addEventListener('click', function (e) {
-  remote.dialog.showOpenDialog(remote.getCurrentWindow(), { properties: [ 'openFile', 'openDirectory' ]}, function (picked) {
-    if (picked !== undefined) {
-      startHosting(picked[0]);
-    }
-  });
-});
-
-stopButton.addEventListener('click', function (e) {
-  if (STATE.serverInstance !== null) {
-    STATE.serverInstance.close();
-    STATE.serverInstance = null;
-  }
-  removeClasses(dropUIs, 'hidden');
-  addClasses(hostingUIs, 'hidden');
-}, false);
+  e.preventDefault();
+}
 
 function ignoreEvent (e) {
   e.preventDefault();
@@ -91,31 +60,13 @@ function handleDragStop (e) {
   ignoreEvent(e);
 }
 
-window.addEventListener("dragover", ignoreEvent, false);
-
-window.addEventListener("dragstart", handleDragStart, false);
-window.addEventListener("dragend", handleDragStop, false);
-
-document.addEventListener("dragleave", handleDragStop, false);
-
-document.addEventListener("dragenter", handleDragStart, false);
-document.addEventListener("dragexit", handleDragStop, false);
-
-
-window.addEventListener("drop", function(e) {
-  var length = e.dataTransfer.files.length;
-  if (length !== 1) { return; }
-  var file = e.dataTransfer.files[0];
-  var filePath = file.path;
-  var isDirectory = fs.lstatSync(filePath).isDirectory();
-  if (isDirectory) {
-    startHosting(filePath);
+function logFn (req, res, error) {
+  var date = new Date().toUTCString();
+  if (error) {
+    console.log([date, req.method, req.url, error.status.toString(), error.message]);
+  } else { // Success
+    console.log([date, req.method, req.url, req.headers['user-agent']]);
   }
-  handleDragStop(e);
-}, false);
-
-function logFn (a,b,c) {
-  console.log(a,b,c);
 }
 
 function removeClasses (elems, classname) {
@@ -140,3 +91,55 @@ function startHosting (folderPath) {
     removeClasses(hostingUIs, 'hidden');
   });
 }
+
+jsPortSelector.addEventListener('keydown', blurOnReturn);
+
+jsPortSelector.addEventListener('blur', function (e) {
+  var validated = parseInt(this.value, 10);
+  if (validated < 1025 || isNaN(validated)) {
+    validated = 8000;
+  } else if (validated > 65535) {
+    validated = 65535;
+  }
+  this.value = validated;
+  STATE.port = validated;
+  jsURLReadout.textContent = 'http://'+HOST+':'+validated;
+});
+
+jsURLReadout.addEventListener('click', openSelectionInBrowser);
+
+stopButton.addEventListener('click', function (e) {
+  if (STATE.serverInstance !== null) {
+    STATE.serverInstance.close();
+    STATE.serverInstance = null;
+  }
+  removeClasses(dropUIs, 'hidden');
+  addClasses(hostingUIs, 'hidden');
+}, false);
+
+
+window.addEventListener("dragover", ignoreEvent, false);
+window.addEventListener("dragstart", handleDragStart, false);
+window.addEventListener("dragend", handleDragStop, false);
+document.addEventListener("dragleave", handleDragStop, false);
+document.addEventListener("dragenter", handleDragStart, false);
+document.addEventListener("dragexit", handleDragStop, false);
+window.addEventListener("drop", function(e) {
+  var length = e.dataTransfer.files.length;
+  if (length !== 1) { return; }
+  var file = e.dataTransfer.files[0];
+  var filePath = file.path;
+  var isDirectory = fs.lstatSync(filePath).isDirectory();
+  if (isDirectory) {
+    startHosting(filePath);
+  }
+  handleDragStop(e);
+}, false);
+
+browseButton.addEventListener('click', function (e) {
+  remote.dialog.showOpenDialog(remote.getCurrentWindow(), { properties: [ 'openDirectory' ]}, function (picked) {
+    if (picked !== undefined) {
+      startHosting(picked[0]);
+    }
+  });
+});
