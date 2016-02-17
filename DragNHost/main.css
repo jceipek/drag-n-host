@@ -48,6 +48,15 @@ body {
   overflow-y: scroll;
   padding: 1rem;
 }
+.info-bubble-status-container,
+.info-bubble-status {
+  transition: padding 300ms;
+}
+.info-bubble-status.hidden,
+.info-bubble-status-container.hidden {
+  display: block;
+  padding: 0;
+}
 .info-bubble-footer {
   background-color: #5e5954;
   padding: 0rem 1rem 1rem 1rem;

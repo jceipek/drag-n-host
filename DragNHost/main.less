@@ -79,6 +79,15 @@ body {
   padding: @info-bubble-padding;
 }
 
+.info-bubble-status-container, .info-bubble-status {
+  transition: padding 300ms;
+}
+
+.info-bubble-status.hidden, .info-bubble-status-container.hidden {
+  display: block;
+  padding: 0;
+}
+
 .info-bubble-footer {
   background-color: @bg-color-info-bubble;
   padding: 0rem @info-bubble-padding @info-bubble-padding @info-bubble-padding; /* top, right, bottom, left */
@@ -162,3 +171,4 @@ body {
 .log-message-error {
   color: @text-color-red;
 }
+
