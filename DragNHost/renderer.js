@@ -22,6 +22,8 @@ const pathElem = document.getElementsByClassName('js-path')[0];
 const jsPortSelector = document.getElementsByClassName('js-port-selector')[0];
 const jsURLReadout = document.getElementsByClassName('js-url-readout')[0];
 
+require('electron').webFrame.setZoomLevelLimits(1, 1)
+
 jsURLReadout.addEventListener('click', function (e) {
   e.preventDefault();
   shell.openExternal(this.textContent);
