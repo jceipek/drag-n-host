@@ -4,6 +4,9 @@ const remote = require('electron').remote;
 const fs = require('fs');
 const serverMaker = require('http-server');
 const shell = require('electron').shell;
+window.$ = window.jQuery = require('jquery');
+const blast = require('blast-text');
+const velocity = require('velocity-animate');
 
 const STATE = {
   path: null
@@ -21,8 +24,13 @@ const stopButton = document.getElementsByClassName('js-stop-hosting')[0];
 const pathElem = document.getElementsByClassName('js-path')[0];
 const jsPortSelector = document.getElementsByClassName('js-port-selector')[0];
 const jsURLReadout = document.getElementsByClassName('js-url-readout')[0];
+const ellipsis = document.getElementsByClassName('js-ellipsis')[0];
 
 require('electron').webFrame.setZoomLevelLimits(1, 1)
+
+
+$('.js-ellipsis').blast({ delimiter: "character" }).velocity({color: '#F00'}, 1000);
+
 
 jsURLReadout.addEventListener('click', function (e) {
   e.preventDefault();
@@ -64,42 +72,35 @@ stopButton.addEventListener('click', function (e) {
   addClasses(hostingUIs, 'hidden');
 }, false);
 
-window.addEventListener("dragover", function(e) {
+function ignoreEvent (e) {
   e.preventDefault();
   e.stopPropagation();
-},false);
+}
 
-window.addEventListener("dragstart", function(e) {
+function handleDragStart (e) {
   STATE.dragReferenceCounter++;
   dropzone.classList.add('dragging');
-  e.preventDefault();
-  e.stopPropagation();
-},false);
+  ignoreEvent(e);
+}
 
-window.addEventListener("dragend", function(e) {
+function handleDragStop (e) {
   STATE.dragReferenceCounter--;
   if (STATE.dragReferenceCounter === 0) {
     dropzone.classList.remove('dragging');
   }
-  e.preventDefault();
-  e.stopPropagation();
-},false);
+  ignoreEvent(e);
+}
 
-document.addEventListener("dragleave", function(e) {
-  STATE.dragReferenceCounter--;
-  if (STATE.dragReferenceCounter === 0) {
-    dropzone.classList.remove('dragging');
-  }
-  e.preventDefault();
-  e.stopPropagation();
-},false);
+window.addEventListener("dragover", ignoreEvent, false);
 
-document.addEventListener("dragenter", function(e) {
-  STATE.dragReferenceCounter++;
-  dropzone.classList.add('dragging');
-  e.preventDefault();
-  e.stopPropagation();
-},false);
+window.addEventListener("dragstart", handleDragStart, false);
+window.addEventListener("dragend", handleDragStop, false);
+
+document.addEventListener("dragleave", handleDragStop, false);
+
+document.addEventListener("dragenter", handleDragStart, false);
+document.addEventListener("dragexit", handleDragStop, false);
+
 
 window.addEventListener("drop", function(e) {
   var length = e.dataTransfer.files.length;
@@ -110,9 +111,7 @@ window.addEventListener("drop", function(e) {
   if (isDirectory) {
     startHosting(filePath);
   }
-  dropzone.classList.remove('dragging');
-  e.preventDefault();
-  e.stopPropagation();
+  handleDragStop(e);
 }, false);
 
 function logFn (a,b,c) {
