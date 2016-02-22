@@ -1,6 +1,7 @@
 'use strict';
 
 const Remote = require('electron').remote;
+
 const Fs = require('fs');
 const ServerMaker = require('http-server');
 const HTTPStatus = require('http-status');
@@ -35,22 +36,28 @@ function ignoreEvent (e) {
 }
 
 function handleDragStart (e) {
+  ignoreEvent(e);
+  if (STATE.serverInstance !== null) {
+    return;
+  }
   STATE.dragReferenceCounter++;
   if (STATE.dragReferenceCounter == 1) {
     Velocity(actionCircle, { scaleX: 1.05, scaleY: 1.05 }, { duration: 500, loop: true });
   }
   actionCircle.classList.add('dragging');
-  ignoreEvent(e);
 }
 
 function handleDragStop (e) {
+  ignoreEvent(e);
+  if (STATE.serverInstance !== null) {
+    return;
+  }
   STATE.dragReferenceCounter--;
   if (STATE.dragReferenceCounter === 0) {
     Velocity(actionCircle, 'stop');
     Velocity(actionCircle, { scaleX: 1, scaleY: 1 }, { duration: 200 });
     actionCircle.classList.remove('dragging');
   }
-  ignoreEvent(e);
 }
 
 function logFn (req, res, error) {
@@ -81,7 +88,7 @@ function addClasses (elems, classname) {
 
 function startHosting (folderPath) {
   if (STATE.serverInstance !== null) { return; }
-  console.log(folderPath);
+  // console.log(folderPath);
   STATE.serverInstance = ServerMaker.createServer({root: folderPath, cache:-1, logFn: logFn, cors: true});
   STATE.serverInstance.listen(STATE.port, HOST, function () {
     pathElem.textContent = folderPath;
@@ -155,13 +162,16 @@ stopButton.addEventListener('click', function (e) {
 }, false);
 
 
-window.addEventListener("dragover", ignoreEvent, false);
-window.addEventListener("dragstart", handleDragStart, false);
-window.addEventListener("dragend", handleDragStop, false);
+document.addEventListener("drag", ignoreEvent, false);
+// window.addEventListener("dragover", ignoreEvent, false);
+document.addEventListener("dragover", ignoreEvent, false);
+// document.addEventListener("dragstart", handleDragStart, false);
+document.addEventListener("dragstart", ignoreEvent, false);
+document.addEventListener("dragend", handleDragStop, false);
 document.addEventListener("dragleave", handleDragStop, false);
 document.addEventListener("dragenter", handleDragStart, false);
 document.addEventListener("dragexit", handleDragStop, false);
-window.addEventListener("drop", function(e) {
+document.addEventListener("drop", function(e) {
   handleDragStop(e);
   var length = e.dataTransfer.files.length;
   if (length !== 1) { return; }
